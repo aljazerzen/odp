@@ -1,0 +1,21 @@
+{{#> layout/base }}
+{{#*inline "content-block"}}
+
+<h2>{{ category.path }}</h2>
+
+<h4>Podkategorije</h4>
+<ul>
+  {{#each category.childrenNames }}
+  <li><a href="/list?category={{ @root.category.path }}.{{ this }}">{{ this }}</a></li>
+  {{/each }}
+</ul>
+
+<h4>Lastnosti</h4>
+<ul>
+  {{#eachKey category.fields }}
+  <li>{{ key }} - <i>{{ value }}</i></li>
+  {{/eachKey }}
+</ul>
+
+{{/inline}}
+{{/layout/base}}
