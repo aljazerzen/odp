@@ -1,21 +1,74 @@
 {{#> layout/base }}
 {{#*inline "content-block"}}
 
-<h2>{{ category.path }}</h2>
+{{#unless (eq category.path '$') }}
+<h2>
+  {{#split category.path '.' }}
+  <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
+
+  {{#unless @last }}
+  <small> > </small>
+  {{/unless}}
+  {{/split }}
+</h2>
+{{/unless}}
 
 <h4>Podkategorije</h4>
 <ul>
   {{#each category.childrenNames }}
-  <li><a href="/list?category={{ @root.category.path }}.{{ this }}">{{ this }}</a></li>
+  <li><a href="/list/{{ @root.category.path }}.{{ this }}">{{ this }}</a></li>
   {{/each }}
 </ul>
 
-<h4>Lastnosti</h4>
-<ul>
+<h4>Filtri</h4>
+
+<form method="GET" action="">
   {{#eachKey category.fields }}
-  <li>{{ key }} - <i>{{ value }}</i></li>
+  <div>
+    <label>{{ key }}</label>
+    <br />
+
+    {{#if (eq value.type 'CATEGORICAL') }}
+    {{#each value.categorical.members }}
+    <input type="checkbox" name="{{ ../key }}" id="{{ ../key }}-{{ this }}" value="{{ this }}">
+    <label for="{{ ../key }}-{{ this }}"> {{ this }}</label>
+    <br />
+    {{/each }}
+    {{/if }}
+    {{#if (eq value.type 'NUMERIC') }}
+    <input type="number" name="{{ key }}.min" value="{{ value.numeric.min }}">
+    -
+    <input type="number" name="{{ key }}.max" value="{{ value.numeric.max }}">
+    {{ value.numeric.unit }}
+    <br />
+    {{/if }}
+
+  </div>
   {{/eachKey }}
-</ul>
+  <br>
+  <button type="submit">Filtriraj</button>
+</form>
+
+<h4>Ponudbe</h4>
+
+<small>Vseh: {{ offerPage.total }}</small>
+
+{{#each offerPage.content }}
+<article>
+  <h5>{{ title }}</h5>
+
+  {{#if price }}
+  {{ price.amount }} {{ price.currency }}
+  {{/if}}
+
+  {{#eachKey @root.category.fields }}
+  {{#with (lookup ../fields key) }}
+  <small>{{ ../key }}:</small>{{ this }}</br>
+  {{/with }}
+
+  {{/eachKey }}
+</article>
+{{/each }}
 
 {{/inline}}
 {{/layout/base}}

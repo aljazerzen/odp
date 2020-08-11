@@ -45,7 +45,7 @@ export class CategoryService {
     return { resolved, category: parent };
   }
 
-  public async getDescendants(category: Category): Promise<Category[]> {
+  public async getDescendants(category: Category | null): Promise<(Category | null)[]> {
     let toQuery = [category];
     const result = [];
 

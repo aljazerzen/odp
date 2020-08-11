@@ -1,21 +1,23 @@
 import { ObjectId } from 'mongodb';
 import { id, ref } from 'mongodb-typescript';
 import { Category } from 'src/category/category.entity';
-
-import { Price } from '../common/price';
+import { Money } from 'src/common/money';
 
 export class Offer {
     @id id: ObjectId;
 
     @ref() category: Category;
 
-    field?: Fields;
+    title?: string;
 
-    price?: Price;
+    field?: { [propertyName: string]: any };
+
+    price?: Money;
 
     reputation: number;
+
+    images: string[];
+
+    description: string;
 }
 
-export class Fields {
-    [propertyName: string]: any;
-}

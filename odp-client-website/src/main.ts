@@ -1,3 +1,5 @@
+import './helpers';
+
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
@@ -13,15 +15,6 @@ async function bootstrap() {
   );
 
   hbs.registerPartials(join(__dirname, '..', 'views', 'partials'), (_error) => null);
-  hbs.registerHelper('eachKey', function (context, options) {
-    let ret = '';
-
-    for (let key in context) {
-      ret = ret + options.fn({ key, value: context[key] });
-    }
-
-    return ret;
-  });
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));

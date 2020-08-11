@@ -15,26 +15,31 @@ export class AppController {
     };
   }
 
-  @Get('/list')
+  @Get('/list/:category')
   @Render('list')
   async listPage(@Req() req: Request) {
-    const categoryPath = req.query.category ?? '$';
+    const categoryPath = req.params.category ?? '$';
     const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
 
     const { data: category } = await this.http.get(sourceUrl + '/category/' + categoryPath).toPromise();
 
-    console.log(category);
+    const offerQuery = {
+      categoryPath: category.path,
+      
+    };
+    const { data: offerPage } = await this.http.get(sourceUrl + '/offer', { data: offerQuery }).toPromise();
 
     return {
       sourceUrl,
-      category
+      category,
+      offerPage
     };
   }
 
   @Post('select-source')
   selectServer(@Body('url') url: string, @Res() res: Response) {
     res.cookie('source', url);
-    res.redirect('/list');
+    res.redirect('/list/$');
   }
 
 }

@@ -1,19 +1,13 @@
-import { FieldType } from './category.entity';
+import { FieldFormat } from './category.entity';
 
 export interface ResolvedCategory {
   path: string;
 
   fields: {
-    [fieldName: string]: FieldType
+    [fieldName: string]: FieldFormat
   };
 }
 
 export interface CategoryDTO extends ResolvedCategory {
-  path: string;
-
-  fields: {
-    [fieldName: string]: FieldType
-  };
-
   childrenNames: string[];
 }

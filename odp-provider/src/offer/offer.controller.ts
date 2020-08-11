@@ -2,7 +2,6 @@ import { Body, Controller, Get } from '@nestjs/common';
 import { Condition } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
-import { FieldType } from 'src/category/category.entity';
 import { CategoryService } from 'src/category/category.service';
 import { Page } from 'src/common/page';
 
@@ -27,19 +26,21 @@ export class OfferController {
     const categoryDescendants = await this.categoryService.getDescendants(category);
 
     const conditions: Condition<Offer>[] = [
-      { categoryId: { $in: categoryDescendants.map(c => c.id) } } as Condition<any>
+      { categoryId: { $in: categoryDescendants.filter(c => !!c).map(c => c.id) } } as Condition<any>
     ];
 
     if (query.price) {
-      conditions.push(...this.offerService.rangeCriteriaToMongoQuery('price', FieldType.MONEY, query.price));
+      conditions.push(...this.offerService.moneyCriteriaToMongoQuery('price', query.price));
     }
 
     if (query.fields) {
       for (const field in query.fields) {
-        const fieldType = resolvedCategory.fields[field];
-        console.log(resolvedCategory.fields, field, fieldType);
-        if (fieldType) {
-          conditions.push(...this.offerService.criteriaToMongoQuery('fields.' + field, fieldType, query.fields[field]))
+        if (query.fields.hasOwnProperty(field)) {
+          const fieldFormat = resolvedCategory.fields[field];
+
+          if (fieldFormat) {
+            conditions.push(...this.offerService.criteriaToMongoQuery('fields.' + field, fieldFormat, query.fields[field]))
+          }
         }
       }
     }

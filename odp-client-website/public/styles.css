@@ -47,3 +47,7 @@ dt {
   float: left;
   min-width: 33%
 }
+
+h5 {
+  margin-bottom: 0;
+}

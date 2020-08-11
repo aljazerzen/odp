@@ -8,10 +8,24 @@ export class Category {
     name: string;
 
     fields: {
-        [fieldName: string]: FieldType
+        [fieldName: string]: FieldFormat
     };
 }
 
+export interface FieldFormat {
+    type: FieldType;
+
+    categorical: {
+        members?: string[]
+    },
+
+    numeric: {
+        min?: number;
+        max?: number;
+        unit?: string;
+    }
+}
+
 export enum FieldType {
-    STRING = 'STRING', NUMBER = 'NUMBER', MONEY = 'MONEY', BOOLEAN = 'BOOLEAN'
+    NUMERIC = 'NUMERIC', MONEY = 'MONEY', CATEGORICAL = 'CATEGORICAL', TEXT = 'TEXT',
 }

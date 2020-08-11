@@ -1,31 +1,46 @@
-import { Money } from '../common/money';
-
 export class OfferQuery {
     categoryPath: string;
 
-    fields?: { [fieldName: string]: GenericCriteria<any> };
+    title?: TextCriteria;
 
-    price?: RangeCriteria<Money>;
+    fields?: { [fieldName: string]: GenericCriteria };
 
-    reputation?: RangeCriteria<number>;
+    price?: MoneyCriteria;
+
+    reputation?: NumericCriteria;
 }
 
-export class GenericCriteria<T> {
-    range?: RangeCriteria<T>;
-    in?: InCriteria<T>;
-}
+export interface GenericCriteria {
+    numeric: NumericCriteria;
+    categorical: CategoricalCriteria;
+    text: TextCriteria;
+    money: MoneyCriteria;
+};
 
 export class Payment {
-    pre?: RangeCriteria<Money>;
-    post?: RangeCriteria<Money>;
-    total?: RangeCriteria<Money>;
+    pre?: MoneyCriteria;
+    post?: MoneyCriteria;
+    total?: MoneyCriteria;
 }
 
-export class RangeCriteria<T> {
-    min?: T;
-    max?: T;
+export class NumericCriteria {
+    min?: number;
+    max?: number;
 }
 
-export class InCriteria<T> {
-    values: T[];
+export class MoneyCriteria {
+    currencies: {
+        currency: string;
+        range: NumericCriteria;
+    }[];
+
+    includeOthers: boolean;
+}
+
+export class TextCriteria {
+    includes: string;
+}
+
+export class CategoricalCriteria {
+    in: string[];
 }
