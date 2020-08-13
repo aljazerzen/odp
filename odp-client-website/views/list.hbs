@@ -30,15 +30,18 @@
 
     {{#if (eq value.type 'CATEGORICAL') }}
     {{#each value.categorical.members }}
-    <input type="checkbox" name="{{ ../key }}" id="{{ ../key }}-{{ this }}" value="{{ this }}">
+    <input type="checkbox" name="f.{{ ../key }}" id="{{ ../key }}-{{ this }}" value="{{ this }}"
+      {{#if (isFieldChecked @root.lastQuery ../key this) }}checked{{/if}}>
     <label for="{{ ../key }}-{{ this }}"> {{ this }}</label>
     <br />
     {{/each }}
     {{/if }}
     {{#if (eq value.type 'NUMERIC') }}
-    <input type="number" name="{{ key }}.min" value="{{ value.numeric.min }}">
+    <input type="number" name="f.{{ key }}.min" placeholder="{{ value.numeric.min }}"
+      value="{{lookup @root.lastQuery (plus 'f.' (plus key '.min') ) }}">
     -
-    <input type="number" name="{{ key }}.max" value="{{ value.numeric.max }}">
+    <input type="number" name="f.{{ key }}.max" placeholder="{{ value.numeric.max }}"
+      value="{{lookup @root.lastQuery (plus 'f.' (plus key '.max') ) }}">
     {{ value.numeric.unit }}
     <br />
     {{/if }}
@@ -49,24 +52,37 @@
   <button type="submit">Filtriraj</button>
 </form>
 
-<h4>Ponudbe</h4>
+<hr />
+
+<h3>Ponudbe</h3>
 
 <small>Vseh: {{ offerPage.total }}</small>
 
 {{#each offerPage.content }}
-<article>
-  <h5>{{ title }}</h5>
+<article style="display: flex;">
+  <div>
+    <h5><a href="/offer/{{id}}">{{ title }}</a></h5>
 
-  {{#if price }}
-  {{ price.amount }} {{ price.currency }}
-  {{/if}}
+    {{#if price }}
+    {{ price.amount }} {{ price.currency }}
+    {{/if}}
 
-  {{#eachKey @root.category.fields }}
-  {{#with (lookup ../fields key) }}
-  <small>{{ ../key }}:</small>{{ this }}</br>
-  {{/with }}
+    <br />
 
-  {{/eachKey }}
+    {{#eachKey @root.category.fields }}
+
+    {{#if (lookup (lookup @root.offerQuery 'fields') key) }}
+    {{#with (lookup ../fields key) }}
+    <small>{{ ../key }}: </small>{{ this }} {{ ../value.numeric.unit }}<br />
+    {{/with }}
+    {{/if}}
+
+    {{/eachKey }}
+  </div>
+  <div style="flex-grow: 1;"></div>
+  <div>
+    <img height="150" src="{{ images.[0] }}" />
+  </div>
 </article>
 {{/each }}
 

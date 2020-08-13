@@ -1,11 +1,12 @@
-import { Body, Controller, Get } from '@nestjs/common';
-import { Condition } from 'mongodb';
+import { Body, Controller, Get, Param } from '@nestjs/common';
+import { Condition, ObjectID } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
 import { CategoryService } from 'src/category/category.service';
 import { Page } from 'src/common/page';
 
 import { OfferQuery } from './offer-query.dto';
+import { OfferDTO } from './offer.dto';
 import { Offer } from './offer.entity';
 import { OfferService } from './offer.service';
 
@@ -19,11 +20,12 @@ export class OfferController {
   ) { }
 
   @Get()
-  public async queryOffers(@Body() query: OfferQuery): Promise<Page<Offer>> {
+  public async queryOffers(@Body() query: OfferQuery): Promise<Page<OfferDTO>> {
 
     const { category, resolved: resolvedCategory } = await this.categoryService.resolveCategory(query.categoryPath ?? '');
 
     const categoryDescendants = await this.categoryService.getDescendants(category);
+    const resolvedCategories = this.categoryService.resolveDescendants(category?.id, resolvedCategory, categoryDescendants);
 
     const conditions: Condition<Offer>[] = [
       { categoryId: { $in: categoryDescendants.filter(c => !!c).map(c => c.id) } } as Condition<any>
@@ -47,9 +49,22 @@ export class OfferController {
 
     const cursor = this.offerRepo.find({ $and: conditions });
 
-    const content = cursor.clone().skip(0 * 10).limit(10).toArray();
-    const total = cursor.count();
+    const total = cursor.clone().count();
+    const content = cursor.skip(0 * 10).limit(10)
+      .map(o => this.offerService.entityToDto(o, resolvedCategories))
+      .toArray();
     return { content: await content, total: await total };
   }
 
+  @Get(':offerId')
+  public async getOffer(@Param('offerId') idString: string): Promise<OfferDTO> {
+    const id = ObjectID.createFromHexString(idString);
+
+    const offer = await this.offerRepo.findById(id);
+
+    const categoryId = (offer as any).categoryId as ObjectID;
+    const category = await this.categoryService.resolveCategoryById(categoryId);
+
+    return this.offerService.entityToDto(offer, { [categoryId.toHexString()]: category });
+  }
 }

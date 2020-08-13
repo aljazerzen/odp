@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Condition } from 'mongodb';
 import { FieldFormat, FieldType } from 'src/category/category.entity';
+import { ResolvedCategory } from 'src/category/resolved-category.dto';
 
 import { CategoricalCriteria, GenericCriteria, MoneyCriteria, NumericCriteria, TextCriteria } from './offer-query.dto';
+import { OfferDTO } from './offer.dto';
+import { Offer } from './offer.entity';
 
 @Injectable()
 export class OfferService {
@@ -74,5 +77,13 @@ export class OfferService {
       case FieldType.MONEY:
         return this.moneyCriteriaToMongoQuery(field, criteria.money) as Condition<T>[];
     }
+  }
+
+  entityToDto(entity: Offer, categories: { [id: string]: ResolvedCategory }): OfferDTO {
+    return {
+      ...entity,
+      categoryId: undefined,
+      categoryPath: categories[(entity as any).categoryId.toHexString()]?.path
+    } as any as OfferDTO
   }
 }

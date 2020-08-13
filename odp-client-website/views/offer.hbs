@@ -1,0 +1,64 @@
+{{#> layout/base }}
+{{#*inline "content-block"}}
+
+{{#unless (eq offer.categoryPath '$') }}
+<h2>
+  {{#split offer.categoryPath '.' }}
+  <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
+
+  {{#unless @last }}
+  <small> > </small>
+  {{/unless}}
+  {{/split }}
+</h2>
+{{/unless}}
+
+
+{{#with offer }}
+
+
+<article style="display: flex;">
+  <div>
+    <h3>{{ title }}</h3>
+
+    <strong>
+      {{#if price }}
+      {{ price.amount }} {{ price.currency }}
+      {{/if}}
+    </strong>
+
+    <div>
+      <small>
+        {{#markdown description }}{{/markdown}}
+      </small>
+    </div>
+
+    <br />
+
+    <table>
+      <tr>
+        {{#eachKey fields }}
+        <td>
+          <b>
+            {{ key }}
+          </b>
+        </td>
+        <td>
+          {{ value }}
+        </td>
+      </tr>
+      {{/eachKey }}
+    </table>
+  </div>
+  <div style="flex-grow: 1;"></div>
+  <div style="display: flex; flex-direction: column; align-items: center; margin-left: 1rem;">
+    {{#each images }}
+    <img width="300" src="{{ this }}" />
+    {{/each }}
+  </div>
+</article>
+
+{{/with }}
+
+{{/inline}}
+{{/layout/base}}
