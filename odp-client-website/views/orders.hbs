@@ -1,0 +1,30 @@
+{{#> layout/base }}
+{{#*inline "content-block"}}
+
+<ul>
+
+  {{#each orders }}
+  <li style="margin-top: 0.5rem;">
+    <article style="display: flex;">
+
+      {{#if id }}
+      <a href="/order/{{uriEncode url }}">{{ id }}</a>
+
+      <div style="flex-grow: 1;"></div>
+
+      <div>{{joinMoney price }}</div>
+
+      <small class="badge" style="margin-left: 0.5rem">{{ status }}</small>
+
+      {{else}}
+      <small>Ne najdem podatkov o <a href="{{ url }}">naročilu</a></small>
+      {{/if }}
+
+    </article>
+  </li>
+  {{/each }}
+
+</ul>
+
+{{/inline}}
+{{/layout/base}}

@@ -14,7 +14,7 @@ export class CategoryService {
     @InjectRepo(Category) private categoryRepo: Repository<Category>
   ) { }
 
-  public async resolveCategory(path: string): Promise<{ resolved: ResolvedCategory, category: Category }> {
+  public async resolveCategory(path: string): Promise<{ resolved: ResolvedCategory, category: Category | null }> {
     if (path.startsWith('$')) {
       path = path.substring(1);
     }
@@ -29,7 +29,7 @@ export class CategoryService {
 
     const names = path.split('.').filter(a => a.length > 0);
 
-    let parent: Category = null;
+    let parent: Category | null = null;
     for (const name of names) {
       const category = await this.categoryRepo.findOne({
         name,
@@ -52,9 +52,11 @@ export class CategoryService {
       fields: {}
     };
 
-    let parentId: ObjectId = categoryId;
+    let parentId: ObjectId | null = categoryId;
     while (parentId) {
       const category = await this.categoryRepo.findById(parentId);
+      if (!category) throw new NotFoundException('CATEGORY_NOT_FOUND');
+
       resolved.path = category.name + '.' + resolved.path;
       resolved.fields = {
         ...category.fields,
@@ -70,7 +72,7 @@ export class CategoryService {
 
   public async getDescendants(category: Category | null): Promise<(Category | null)[]> {
     let toQuery = [category];
-    const result = [];
+    const result: (Category | null)[] = [];
 
     while (toQuery.length > 0) {
       result.push(...toQuery);
@@ -80,9 +82,9 @@ export class CategoryService {
     return result;
   }
 
-  public resolveDescendants(parentId: ObjectId | null, parent: ResolvedCategory | null, categories: Category[]): { [id: string]: ResolvedCategory } {
-    const resolved: { [id: string]: ResolvedCategory } = {
-      [parentId?.toHexString()]: parent
+  public resolveDescendants(parentId: ObjectId | null, parent: ResolvedCategory | null, categories: (Category | null)[]): ResolvedCategoryMap {
+    const resolved: ResolvedCategoryMap = {
+      [parentId?.toHexString() ?? '']: parent
     };
 
     const unresolved = [...categories];
@@ -95,7 +97,7 @@ export class CategoryService {
         const c = unresolved[i];
         if (!c) continue;
 
-        const p = resolved[c.parentId?.toHexString()];
+        const p = resolved[c.parentId?.toHexString() ?? ''];
         if (p) {
           unresolved.splice(i, 1);
           i--;
@@ -119,3 +121,5 @@ export class CategoryService {
   }
 
 }
+
+export interface ResolvedCategoryMap { [id: string]: ResolvedCategory | null }

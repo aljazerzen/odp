@@ -3,12 +3,12 @@
 
 <head>
   <meta charset="utf-8" />
-  <base href="/" >
+  <base href="/">
   <title>
     {{#if title}}
-      {{title}}
+    {{title}}
     {{else}}
-      ODP Client
+    ODP Client
     {{/if}}
   </title>
   <link rel="stylesheet" href="/styles.css">
@@ -16,12 +16,21 @@
 
 <body>
 
-  <form method="POST" action="/select-source">
-    <label for="selectSourceInput">URL of the ODP server</label>
-    <br />
-    <input type="url" name="url" id="selectSourceInput" value="{{ sourceUrl }}"/>
-    <button type="submit">Go</button>
-  </form>
+  <div style="display: flex;">
+    <form method="POST" action="/select-source">
+      <label for="selectSourceInput">URL of the ODP server</label>
+      <br />
+      <input type="url" name="url" id="selectSourceInput" value="{{ sourceUrl }}" />
+      <button type="submit">Go</button>
+    </form>
+
+    <div style="flex-grow: 1;"></div>
+
+    <div>
+      <a href="/cart">Košarica</a>
+      <a href="/orders">Naročila</a>
+    </div>
+  </div>
 
   {{#> content-block}}
   {{/content-block}}

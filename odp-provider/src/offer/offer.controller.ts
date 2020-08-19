@@ -1,16 +1,17 @@
-import { Body, Controller, Get, Param } from '@nestjs/common';
-import { Condition, ObjectID } from 'mongodb';
+import { Body, Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { Condition, ObjectID, ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
 import { CategoryService } from 'src/category/category.service';
 import { Page } from 'src/common/page';
 
+import { ObjectIdPipe } from '../object-id.pipe';
 import { OfferQuery } from './offer-query.dto';
 import { OfferDTO } from './offer.dto';
 import { Offer } from './offer.entity';
 import { OfferService } from './offer.service';
 
-@Controller('offer')
+@Controller('offers')
 export class OfferController {
 
   constructor(
@@ -25,14 +26,14 @@ export class OfferController {
     const { category, resolved: resolvedCategory } = await this.categoryService.resolveCategory(query.categoryPath ?? '');
 
     const categoryDescendants = await this.categoryService.getDescendants(category);
-    const resolvedCategories = this.categoryService.resolveDescendants(category?.id, resolvedCategory, categoryDescendants);
+    const resolvedCategories = this.categoryService.resolveDescendants(category?.id ?? null, resolvedCategory, categoryDescendants);
 
     const conditions: Condition<Offer>[] = [
-      { categoryId: { $in: categoryDescendants.filter(c => !!c).map(c => c.id) } } as Condition<any>
+      { categoryId: { $in: categoryDescendants.filter(c => !!c).map(c => c?.id) } } as Condition<any>
     ];
 
     if (query.price) {
-      conditions.push(...this.offerService.moneyCriteriaToMongoQuery('price', query.price));
+      conditions.push(...this.offerService.moneyCriteriaToMongoQuery<Offer>('price', query.price));
     }
 
     if (query.fields) {
@@ -41,7 +42,7 @@ export class OfferController {
           const fieldFormat = resolvedCategory.fields[field];
 
           if (fieldFormat) {
-            conditions.push(...this.offerService.criteriaToMongoQuery('fields.' + field, fieldFormat, query.fields[field]))
+            conditions.push(...this.offerService.criteriaToMongoQuery<Offer>('fields.' + field, fieldFormat, query.fields[field]))
           }
         }
       }
@@ -57,10 +58,9 @@ export class OfferController {
   }
 
   @Get(':offerId')
-  public async getOffer(@Param('offerId') idString: string): Promise<OfferDTO> {
-    const id = ObjectID.createFromHexString(idString);
-
+  public async getOffer(@Param('offerId', new ObjectIdPipe('OFFER')) id: ObjectId): Promise<OfferDTO> {
     const offer = await this.offerRepo.findById(id);
+    if (!offer) throw new NotFoundException('OFFER_NOT_FOUND');
 
     const categoryId = (offer as any).categoryId as ObjectID;
     const category = await this.categoryService.resolveCategoryById(categoryId);

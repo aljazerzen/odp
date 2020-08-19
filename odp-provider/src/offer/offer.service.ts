@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Condition } from 'mongodb';
 import { FieldFormat, FieldType } from 'src/category/category.entity';
-import { ResolvedCategory } from 'src/category/resolved-category.dto';
+import { ResolvedCategoryMap } from 'src/category/category.service';
 
 import { CategoricalCriteria, GenericCriteria, MoneyCriteria, NumericCriteria, TextCriteria } from './offer-query.dto';
 import { OfferDTO } from './offer.dto';
@@ -79,7 +79,7 @@ export class OfferService {
     }
   }
 
-  entityToDto(entity: Offer, categories: { [id: string]: ResolvedCategory }): OfferDTO {
+  entityToDto(entity: Offer, categories: ResolvedCategoryMap): OfferDTO {
     return {
       ...entity,
       categoryId: undefined,

@@ -1,0 +1,73 @@
+{{#> layout/base }}
+{{#*inline "content-block"}}
+
+<h3>Košarica</h3>
+
+{{#each cartBySource }}
+
+<div style="display: flex">
+  <div>
+    <small>{{ sourceUrl }}</small>
+
+    <summary>
+      Skupaj: {{joinMoney (cartTotal cart) }}
+    </summary>
+  </div>
+
+  <div style="flex-grow: 1;"></div>
+
+  <div>
+    <form action="/order" method="POST">
+      <input type="hidden" name="sourceUrl" value="{{ sourceUrl }}" />
+      <input type="submit" value="Place order" />
+    </form>
+  </div>
+
+</div>
+
+<ul>
+
+  {{#each cart }}
+  <li>
+    <article style="display: flex; align-items: center">
+      <div>
+        <h5><a href="/offer/{{offer.id}}">{{ offer.title }}</a></h5>
+
+        <div>
+          {{#if offer.price }}
+          {{ offer.price.amount }} {{ offer.price.currency }}
+          {{/if}}
+
+          x{{ amount }}
+        </div>
+
+        <br />
+      </div>
+      <div style="margin-left: 1rem">
+        <form action="/cart/amount" method="POST">
+          <input type="hidden" name="offerId" value="{{ offer.id }}" />
+          <input type="hidden" name="amount" value="{{plus amount 1 }}" />
+          <input type="submit" value="+" />
+        </form>
+
+        <form action="/cart/amount" method="POST">
+          <input type="hidden" name="offerId" value="{{ offer.id }}" />
+          <input type="hidden" name="amount" value="{{plus amount -1 }}" />
+          <input type="submit" value="-" />
+        </form>
+      </div>
+
+      <div style="flex-grow: 1;"></div>
+      <div>
+        <img height="80" src="{{ offer.images.[0] }}" />
+      </div>
+    </article>
+  </li>
+  {{/each }}
+
+</ul>
+
+{{/each }}
+
+{{/inline}}
+{{/layout/base}}

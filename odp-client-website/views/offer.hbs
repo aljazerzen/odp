@@ -49,6 +49,12 @@
       </tr>
       {{/eachKey }}
     </table>
+
+    <form method="POST" action="/cart">
+      <input type="hidden" value="{{ id }}" name="offerId" />
+      <input type="hidden" value="1" name="amount" />
+      <input type="submit" value="Add to cart" />
+    </form>
   </div>
   <div style="flex-grow: 1;"></div>
   <div style="display: flex; flex-direction: column; align-items: center; margin-left: 1rem;">

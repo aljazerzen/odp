@@ -3,7 +3,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryDTO } from './resolved-category.dto';
 
-@Controller('category')
+@Controller('categories')
 export class CategoryController {
 
   constructor(

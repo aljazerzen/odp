@@ -13,6 +13,9 @@ import { OfferService } from './offer.service';
     OfferService,
     mongodb.forRepository(Offer, 'offers'),
   ],
+  exports: [
+    mongodb.forRepository(Offer, 'offers'),
+  ],
   imports: [DatabaseModule, CategoryModule]
 })
 export class OfferModule {
