@@ -15,7 +15,7 @@ export class OrderController {
   ) { }
 
   @Get('/orders')
-  @Render('orders')
+  @Render('order/orders')
   async ordersPage(@Req() req: Request) {
     const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
 
@@ -65,7 +65,7 @@ export class OrderController {
 
       lastOrderUrl = orderUrl;
     }
-    res.cookie('orders', JSON.stringify(orderUrls));
+    res.cookie('orders', JSON.stringify(orderUrls), { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) });
 
     // remove items from cart
     const newCart = cart.filter(i => i.sourceUrl !== sourceUrl);
@@ -79,7 +79,7 @@ export class OrderController {
   }
 
   @Get('/order/:orderUrl')
-  @Render('order')
+  @Render('order/order')
   async orderPage(
     @Param('orderUrl', new UriComponentPipe()) orderUrl: string
   ) {

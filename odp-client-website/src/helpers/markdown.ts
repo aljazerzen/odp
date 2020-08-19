@@ -5,5 +5,5 @@ import * as hbs from 'hbs';
 const md = new markdownIt();
 
 hbs.registerHelper('markdown', function (markdown: string, options: HelperOptions) {
-  return md.render(markdown);
+  return md.render(markdown ?? '');
 });

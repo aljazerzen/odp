@@ -13,7 +13,7 @@ export class CartController {
   ) { }
 
   @Get('cart')
-  @Render('cart')
+  @Render('cart/cart')
   async cart(@Req() req: Request) {
     const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
 

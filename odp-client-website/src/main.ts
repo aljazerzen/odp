@@ -14,10 +14,10 @@ async function bootstrap() {
     AppModule,
   );
 
-  hbs.registerPartials(join(__dirname, '..', 'views', 'partials'), (_error) => null);
+  hbs.registerPartials(join(__dirname, '..', 'src'), (_error) => _error ? console.error(_error) : null);
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setBaseViewsDir(join(__dirname, '..', 'src'));
   app.setViewEngine('hbs');
 
   app.use(cookieParser())

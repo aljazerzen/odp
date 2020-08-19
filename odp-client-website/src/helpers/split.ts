@@ -2,7 +2,7 @@ import { createFrame, HelperOptions } from 'handlebars';
 import * as hbs from 'hbs';
 
 hbs.registerHelper('split', function (fullString: string, splitter, options: HelperOptions) {
-  const parts = fullString.split(splitter);
+  const parts = fullString?.split(splitter) ?? [];
 
   const res = [];
   const data = options.data ? createFrame(options.data) : undefined;

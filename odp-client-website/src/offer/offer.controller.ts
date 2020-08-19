@@ -13,7 +13,7 @@ export class OfferController {
   ) { }
 
   @Get('/list/:category')
-  @Render('list')
+  @Render('offer/list')
   async listPage(@Req() req: Request) {
     const categoryPath = req.params.category ?? '$';
     const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
@@ -71,13 +71,13 @@ export class OfferController {
   }
 
   @Get('/offer/:offerId')
-  @Render('offer')
+  @Render('offer/offer')
   async offerPage(@Req() req: Request) {
     const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
 
     return {
       sourceUrl,
-      offer: this.offerService.get(sourceUrl, req.params.offerId)
+      offer: await this.offerService.get(sourceUrl, req.params.offerId)
     };
   }
 }
