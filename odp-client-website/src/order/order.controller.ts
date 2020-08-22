@@ -2,8 +2,8 @@ import { Body, Controller, Get, HttpService, Param, Post, Render, Req, Res } fro
 import { Request, Response } from 'express';
 
 import { CartService } from '../cart/cart.service';
-import { UriComponentPipe } from '../uri-component.pipe';
 import { OfferService } from '../offer/offer.service';
+import { UriComponentPipe } from '../uri-component.pipe';
 
 @Controller()
 export class OrderController {
@@ -83,7 +83,15 @@ export class OrderController {
   async orderPage(
     @Param('orderUrl', new UriComponentPipe()) orderUrl: string
   ) {
-    const { data: order } = await this.http.get(orderUrl).toPromise();
+    const { data: order, status } = await this.http.get(orderUrl).toPromise().catch(e => {
+      console.warn(e.toString());
+      return { data: null, status: 0 };
+    });
+
+    if (status !== 200) {
+      console.log(status, order);
+      return {};
+    }
 
     const sourceUrl = orderUrl.split('/orders/')[0]
 
@@ -93,8 +101,49 @@ export class OrderController {
 
     return {
       sourceUrl,
+      orderUrl: sourceUrl + '/orders/' + order.id,
       order
     };
+  }
+
+  @Post('/order/:orderUrl/commit')
+  async commitOrder(
+    @Param('orderUrl', new UriComponentPipe()) orderUrl: string, @Res() res: Response
+  ) {
+    const { data } = await this.http.post(orderUrl + '/commitment').toPromise();
+    console.log(data);
+
+    res.redirect('/order/' + encodeURIComponent(orderUrl))
+  }
+
+  @Post('/order/:orderUrl/pre-select')
+  async selectPreOrder(
+    @Param('orderUrl', new UriComponentPipe()) orderUrl: string, @Body() body: { method: string }, @Res() res: Response
+  ) {
+    const { data } = await this.http.post(orderUrl + '/pre-selection', { selectedMethod: body.method }).toPromise();
+    console.log(data);
+
+    res.redirect('/order/' + encodeURIComponent(orderUrl))
+  }
+
+  @Post('/order/:orderUrl/confirm')
+  async confirmOrder(
+    @Param('orderUrl', new UriComponentPipe()) orderUrl: string, @Res() res: Response
+  ) {
+    const { data } = await this.http.post(orderUrl + '/confirmation').toPromise();
+    console.log(data);
+
+    res.redirect('/order/' + encodeURIComponent(orderUrl))
+  }
+
+  @Post('/order/:orderUrl/post-select')
+  async selectPostOrder(
+    @Param('orderUrl', new UriComponentPipe()) orderUrl: string, @Body() body: { method: string }, @Res() res: Response
+  ) {
+    const { data } = await this.http.post(orderUrl + '/post-selection', { selectedMethod: body.method }).toPromise();
+    console.log(data);
+
+    res.redirect('/order/' + encodeURIComponent(orderUrl))
   }
 }
 

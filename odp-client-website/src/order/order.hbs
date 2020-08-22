@@ -4,7 +4,7 @@
 {{#with order }}
 <main>
 
-  <h3><span class="badge">{{ status }}</span></h3>
+  <h3><span class="badge">{{> order/order_status status=status }}</span></h3>
 
   <summary>
     Skupaj: {{joinMoney price }}
@@ -38,6 +38,52 @@
     {{/each }}
 
   </ul>
+
+  {{#if (eq status 'COMMIT') }}
+  <form action="/order/{{uriEncode @root.orderUrl }}/commit" method="POST">
+    <input type="submit" value="Potrdi naročilo" />
+  </form>
+  {{/if }}
+
+  {{#if (eq status 'PRE_SELECT') }}
+  Možni načini predplačila {{joinMoney prePayment.money }}:
+  <form action="/order/{{uriEncode @root.orderUrl }}/pre-select" method="POST">
+    {{#each prePayment.availableMethods }}
+    <input type="radio" name="method" value="{{ this }}" id="method-{{this}}">
+    <label for="method-{{this}}">{{ this }}</label>
+    <br />
+    {{/each }}
+
+    <input type="submit" value="Izberi metodo predplačila" />
+  </form>
+  {{/if }}
+
+  {{#if (eq status 'PRE_PROVIDE') }}
+  Plačajte {{joinMoney prePayment.money }} z {{ prePayment.selectedMethod }}:
+  {{/if }}
+
+  {{#if (eq status 'CONFIRM') }}
+  <form action="/order/{{uriEncode @root.orderUrl }}/confirm" method="POST">
+    <input type="submit" value="Potrdi prejete artikle" />
+  </form>
+  {{/if }}
+
+  {{#if (eq status 'POST_SELECT') }}
+  Možni načini plačila {{joinMoney postPayment.money }}:
+  <form action="/order/{{uriEncode @root.orderUrl }}/post-select" method="POST">
+    {{#each postPayment.availableMethods }}
+    <input type="radio" name="method" value="{{ this }}" id="method-{{this}}">
+    <label for="method-{{this}}">{{ this }}</label>
+    <br />
+    {{/each }}
+
+    <input type="submit" value="Izberi metodo plačila" />
+  </form>
+  {{/if }}
+
+  {{#if (eq status 'POST_PROVIDE') }}
+  Plačajte {{joinMoney postPayment.money }} z {{ postPayment.selectedMethod }}:
+  {{/if }}
 
 </main>
 {{/with }}

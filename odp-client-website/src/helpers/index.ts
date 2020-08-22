@@ -6,6 +6,6 @@ import './and';
 import './plus';
 import './is-field-checked';
 import './markdown';
-import './cart-total';
 import './uri-encode';
 import './join-money';
+import './switch';

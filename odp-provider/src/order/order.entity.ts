@@ -17,18 +17,29 @@ export class Order {
   price: Money[];
 
   status: OrderStatus;
+
+  prePayment?: PaymentRequest;
+  postPayment?: PaymentRequest;
 }
 
 export enum OrderStatus {
   QUOTE = 'QUOTE',
   COMMIT = 'COMMIT',
-  REQUEST_PRE = 'REQUEST_PRE',
-  PROVIDE_PRE = 'PROVIDE_PRE',
+  PRE_REQUEST = 'PRE_REQUEST',
+  PRE_SELECT = 'PRE_SELECT',
+  PRE_PROVIDE = 'PRE_PROVIDE',
   ISSUE = 'ISSUE',
   CONFIRM = 'CONFIRM',
-  REQUEST_POST = 'REQUEST_POST',
-  PROVIDE_POST = 'PROVIDE_POST',
+  POST_REQUEST = 'POST_REQUEST',
+  POST_SELECT = 'POST_SELECT',
+  POST_PROVIDE = 'POST_PROVIDE',
   RATE = 'RATE',
   DONE = 'DONE',
   CANCEL = 'CANCEL',
+}
+
+export class PaymentRequest {
+  money: Money[];
+  availableMethods: string[];
+  selectedMethod?: string;
 }

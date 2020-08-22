@@ -1,0 +1,16 @@
+{{#switch status }}
+{{#case 'QUOTE' }}Predračun v pripravi{{/case }}
+{{#case 'COMMIT' }}Čaka potrditev{{/case }}
+{{#case 'PRE_REQUEST' }}Izdajanje zahteve za predplačilo{{/case }}
+{{#case 'PRE_SELECT' }}Izbira metode predplačila{{/case }}
+{{#case 'PRE_PROVIDE' }}Čaka predplačilo{{/case }}
+{{#case 'ISSUE' }}Izdajanje naročila{{/case }}
+{{#case 'CONFIRM' }}Čaka potrditev o prejetju{{/case }}
+{{#case 'POST_REQUEST' }}Izdajanje zahteve za plačilo{{/case }}
+{{#case 'POST_SELECT' }}Izbira metode plačila{{/case }}
+{{#case 'POST_PROVIDE' }}Čaka plačilo{{/case }}
+{{#case 'RATE' }}Čaka oceno{{/case }}
+{{#case 'DONE' }}Zaključeno{{/case }}
+{{#case 'CANCEL' }}Preklicano{{/case }}
+{{#default }}Neznan status naročila{{/default }}
+{{/switch }}

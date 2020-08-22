@@ -1,8 +1,10 @@
+import './cart-total.helper';
+
 import { Body, Controller, Get, HttpService, Post, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { CartService } from './cart.service';
 import { prependRelativeUrl } from '../url-util';
+import { CartService } from './cart.service';
 
 @Controller()
 export class CartController {
