@@ -4,8 +4,8 @@ import { FieldFormat, FieldType } from 'src/category/category.entity';
 import { ResolvedCategoryMap } from 'src/category/category.service';
 
 import { CategoricalCriteria, GenericCriteria, MoneyCriteria, NumericCriteria, TextCriteria } from './offer-query.dto';
-import { OfferDTO } from './offer.dto';
-import { Offer } from './offer.entity';
+import { Offer } from './offer.dto';
+import { OfferEntity } from './offer.entity';
 
 @Injectable()
 export class OfferService {
@@ -79,11 +79,11 @@ export class OfferService {
     }
   }
 
-  entityToDto(entity: Offer, categories: ResolvedCategoryMap): OfferDTO {
+  entityToDto(entity: OfferEntity, categories: ResolvedCategoryMap): Offer {
     return {
       ...entity,
       categoryId: undefined,
       categoryPath: categories[(entity as any).categoryId.toHexString()]?.path
-    } as any as OfferDTO
+    } as any as Offer
   }
 }

@@ -3,18 +3,18 @@ import { ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
 
-import { Category } from './category.entity';
-import { ResolvedCategory } from './resolved-category.dto';
+import { ResolvedCategory } from './category.dto';
+import { CategoryEntity } from './category.entity';
 
 
 @Injectable()
 export class CategoryService {
 
   constructor(
-    @InjectRepo(Category) private categoryRepo: Repository<Category>
+    @InjectRepo(CategoryEntity) private categoryRepo: Repository<CategoryEntity>
   ) { }
 
-  public async resolveCategory(path: string): Promise<{ resolved: ResolvedCategory, category: Category | null }> {
+  public async resolveCategory(path: string): Promise<{ resolved: ResolvedCategory, category: CategoryEntity | null }> {
     if (path.startsWith('$')) {
       path = path.substring(1);
     }
@@ -29,7 +29,7 @@ export class CategoryService {
 
     const names = path.split('.').filter(a => a.length > 0);
 
-    let parent: Category | null = null;
+    let parent: CategoryEntity | null = null;
     for (const name of names) {
       const category = await this.categoryRepo.findOne({
         name,
@@ -70,9 +70,9 @@ export class CategoryService {
     return resolved;
   }
 
-  public async getDescendants(category: Category | null): Promise<(Category | null)[]> {
+  public async getDescendants(category: CategoryEntity | null): Promise<(CategoryEntity | null)[]> {
     let toQuery = [category];
-    const result: (Category | null)[] = [];
+    const result: (CategoryEntity | null)[] = [];
 
     while (toQuery.length > 0) {
       result.push(...toQuery);
@@ -82,7 +82,7 @@ export class CategoryService {
     return result;
   }
 
-  public resolveDescendants(parentId: ObjectId | null, parent: ResolvedCategory | null, categories: (Category | null)[]): ResolvedCategoryMap {
+  public resolveDescendants(parentId: ObjectId | null, parent: ResolvedCategory | null, categories: (CategoryEntity | null)[]): ResolvedCategoryMap {
     const resolved: ResolvedCategoryMap = {
       [parentId?.toHexString() ?? '']: parent
     };
@@ -114,7 +114,7 @@ export class CategoryService {
     return resolved;
   }
 
-  public async getChildren(categories: (Category | null)[]): Promise<Category[]> {
+  public async getChildren(categories: (CategoryEntity | null)[]): Promise<CategoryEntity[]> {
     return await this.categoryRepo.find({
       parentId: { $in: categories.map(c => c?.id) }
     }).toArray();

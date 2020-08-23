@@ -1,39 +1,43 @@
 import { Body, Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Condition, ObjectID, ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
 import { CategoryService } from 'src/category/category.service';
-import { Page } from 'src/common/page';
+import { Error } from 'src/common/error.dto';
 
 import { ObjectIdPipe } from '../object-id.pipe';
 import { OfferQuery } from './offer-query.dto';
-import { OfferDTO } from './offer.dto';
-import { Offer } from './offer.entity';
+import { Offer, OfferPage } from './offer.dto';
+import { OfferEntity } from './offer.entity';
 import { OfferService } from './offer.service';
 
 @Controller('offers')
+@ApiTags('offer')
 export class OfferController {
 
   constructor(
-    @InjectRepo(Offer) private offerRepo: Repository<Offer>,
+    @InjectRepo(OfferEntity) private offerRepo: Repository<OfferEntity>,
     private categoryService: CategoryService,
     private offerService: OfferService
   ) { }
 
   @Get()
-  public async queryOffers(@Body() query: OfferQuery): Promise<Page<OfferDTO>> {
+  @ApiOkResponse({ type: OfferPage })
+  @ApiNotFoundResponse({ type: Error })
+  public async queryOffers(@Body() query: OfferQuery): Promise<OfferPage> {
 
     const { category, resolved: resolvedCategory } = await this.categoryService.resolveCategory(query.categoryPath ?? '');
 
     const categoryDescendants = await this.categoryService.getDescendants(category);
     const resolvedCategories = this.categoryService.resolveDescendants(category?.id ?? null, resolvedCategory, categoryDescendants);
 
-    const conditions: Condition<Offer>[] = [
+    const conditions: Condition<OfferEntity>[] = [
       { categoryId: { $in: categoryDescendants.filter(c => !!c).map(c => c?.id) } } as Condition<any>
     ];
 
     if (query.price) {
-      conditions.push(...this.offerService.moneyCriteriaToMongoQuery<Offer>('price', query.price));
+      conditions.push(...this.offerService.moneyCriteriaToMongoQuery<OfferEntity>('price', query.price));
     }
 
     if (query.fields) {
@@ -42,7 +46,7 @@ export class OfferController {
           const fieldFormat = resolvedCategory.fields[field];
 
           if (fieldFormat) {
-            conditions.push(...this.offerService.criteriaToMongoQuery<Offer>('fields.' + field, fieldFormat, query.fields[field]))
+            conditions.push(...this.offerService.criteriaToMongoQuery<OfferEntity>('fields.' + field, fieldFormat, query.fields[field]))
           }
         }
       }
@@ -57,8 +61,11 @@ export class OfferController {
     return { content: await content, total: await total };
   }
 
-  @Get(':offerId')
-  public async getOffer(@Param('offerId', new ObjectIdPipe('OFFER')) id: ObjectId): Promise<OfferDTO> {
+  @Get(':id')
+  @ApiParam({ type: 'string', name: 'id' })
+  @ApiOkResponse({ type: Offer })
+  @ApiNotFoundResponse({ type: Error })
+  public async getOffer(@Param('id', new ObjectIdPipe('OFFER')) id: ObjectId): Promise<Offer> {
     const offer = await this.offerRepo.findById(id);
     if (!offer) throw new NotFoundException('OFFER_NOT_FOUND');
 

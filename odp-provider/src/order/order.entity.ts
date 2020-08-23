@@ -1,18 +1,19 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { id, nested, ref } from 'mongodb-typescript';
 import { Money } from 'src/common/money';
-import { Offer } from 'src/offer/offer.entity';
+import { OfferEntity } from 'src/offer/offer.entity';
 
-export class OrderItem {
-  @ref() offer: Offer;
+export class OrderItemEntity {
+  @ref() offer: OfferEntity;
 
   amount: number;
 }
 
-export class Order {
+export class OrderEntity {
   @id id: ObjectId;
 
-  @nested(() => OrderItem) items: OrderItem[];
+  @nested(() => OrderItemEntity) items: OrderItemEntity[];
 
   price: Money[];
 
@@ -39,7 +40,15 @@ export enum OrderStatus {
 }
 
 export class PaymentRequest {
+  @ApiProperty({ type: Money, isArray: true })
   money: Money[];
+  @ApiProperty({ type: 'string', isArray: true })
   availableMethods: string[];
+  @ApiProperty({ type: 'string', required: false })
+  selectedMethod?: string;
+}
+
+export class PaymentMethodSelection {
+  @ApiProperty({ type: 'string', required: false })
   selectedMethod?: string;
 }

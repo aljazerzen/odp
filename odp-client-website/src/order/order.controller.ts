@@ -23,8 +23,11 @@ export class OrderController {
 
     const orders = await Promise.all(
       orderUrls.map(async orderUrl => {
-        const { data: order } = await this.http.get(orderUrl).toPromise();
-        return { ...(order || {}), url: orderUrl };
+        const { data: order } = await this.http.get(orderUrl).toPromise().catch(e => {
+          console.warn(e.toString());
+          return { data: {} };
+        });
+        return { ...order, url: orderUrl };
       })
     );
 

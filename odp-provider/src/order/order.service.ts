@@ -4,21 +4,21 @@ import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
 import { Money } from 'src/common/money';
 import { moneyAggregate, moneyMultiply } from 'src/money-util';
-import { Offer } from 'src/offer/offer.entity';
+import { OfferEntity } from 'src/offer/offer.entity';
 
-import { OrderDTO, OrderItemDTO } from './order.dto';
-import { Order, OrderItem, OrderStatus } from './order.entity';
+import { Order, OrderItem } from './order.dto';
+import { OrderEntity, OrderItemEntity, OrderStatus } from './order.entity';
 
 @Injectable()
 export class OrderService {
 
   constructor(
-    @InjectRepo(Order) private orderRepo: Repository<Order>,
-    @InjectRepo(Offer) private offerRepo: Repository<Offer>,
+    @InjectRepo(OrderEntity) private orderRepo: Repository<OrderEntity>,
+    @InjectRepo(OfferEntity) private offerRepo: Repository<OfferEntity>,
   ) { }
 
-  async createItem(i: OrderItemDTO): Promise<OrderItem> {
-    const item = new OrderItem();
+  async createItem(i: OrderItem): Promise<OrderItemEntity> {
+    const item = new OrderItemEntity();
     item.amount = i.amount;
 
     let id: ObjectId;
@@ -33,7 +33,7 @@ export class OrderService {
     return item;
   }
 
-  public toDto(entity: Order): OrderDTO {
+  public toDto(entity: OrderEntity): Order {
     return {
       id: entity.id.toHexString(),
       items: entity.items.map(i => ({

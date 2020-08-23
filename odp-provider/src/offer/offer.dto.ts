@@ -1,20 +1,36 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Money } from 'src/common/money';
 
-export class OfferDTO {
-    id: string;
+export class Offer {
+  @ApiProperty()
+  id: string;
 
-    categoryPath: string;
+  @ApiProperty()
+  categoryPath: string;
 
-    title?: string;
+  @ApiProperty()
+  title?: string;
 
-    field?: { [propertyName: string]: any };
+  @ApiProperty()
+  field?: { [propertyName: string]: any };
 
-    price?: Money;
+  @ApiProperty()
+  price?: Money;
 
-    reputation: number;
+  @ApiProperty()
+  reputation: number;
 
-    images: string[];
+  @ApiProperty({ isArray: true, type: 'string' })
+  images: string[];
 
-    description: string;
+  @ApiProperty()
+  description: string;
 }
 
+export class OfferPage {
+  @ApiProperty({ type: Offer, isArray: true })
+  content: Offer[];
+
+  @ApiProperty({ type: 'integer' })
+  total: number;
+}

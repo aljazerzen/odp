@@ -1,38 +1,52 @@
-import { Body, Controller, ForbiddenException, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
 import { InjectRepo } from 'nestjs-mongodb';
+import { Error } from 'src/common/error.dto';
 import { ObjectIdPipe } from 'src/object-id.pipe';
 
-import { OrderDTO } from './order.dto';
-import { Order, OrderItem, OrderStatus, PaymentRequest } from './order.entity';
+import { Order } from './order.dto';
+import { OrderEntity, OrderItemEntity, OrderStatus, PaymentMethodSelection } from './order.entity';
 import { OrderService } from './order.service';
 
 @Controller('orders')
+@ApiTags('order')
 export class OrderController {
 
   constructor(
-    @InjectRepo(Order) private orderRepo: Repository<Order>,
+    @InjectRepo(OrderEntity) private orderRepo: Repository<OrderEntity>,
     private orderService: OrderService,
   ) { }
 
   @Get(':id')
-  public async getOffer(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId) {
+  @ApiParam({ type: 'string', name: 'id' })
+  @ApiOkResponse({ type: Order })
+  @ApiNotFoundResponse({ type: Error })
+  public async getOffer(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId): Promise<Order> {
     const order = await this.orderRepo.findById(id);
+    if (!order) throw new NotFoundException('ORDER_NOT_FOUND');
 
-    return order;
+    return this.orderService.toDto(order);
   }
 
   @Post()
-  public async placeOrder(@Body() body: OrderDTO): Promise<OrderDTO[]> {
-    const order = new Order();
+  public async placeOrder(@Body() body: Order): Promise<Order[]> {
+    const order = new OrderEntity();
 
     order.status = OrderStatus.QUOTE;
 
-    const items = await Promise.all<OrderItem | null>(
+    const items = await Promise.all<OrderItemEntity | null>(
       body.items.map(i => this.orderService.createItem(i))
     );
-    order.items = items.filter(i => i !== null && i.offer !== undefined) as OrderItem[];
+    order.items = items.filter(i => i !== null && i.offer !== undefined) as OrderItemEntity[];
 
     await this.orderRepo.save(order);
 
@@ -43,6 +57,9 @@ export class OrderController {
   }
 
   @Post(':id/commitment')
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse({ type: Error })
+  @ApiParam({ type: 'string', name: 'id' })
   public async commitOrder(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId) {
     const order = await this.orderRepo.findById(id);
 
@@ -59,7 +76,10 @@ export class OrderController {
   }
 
   @Post(':id/pre-selection')
-  public async selectPrePaymentMethod(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId, @Body() body: PaymentRequest) {
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse({ type: Error })
+  @ApiParam({ type: 'string', name: 'id' })
+  public async selectPrePaymentMethod(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId, @Body() body: PaymentMethodSelection) {
     const order = await this.orderRepo.findById(id);
 
     if (order?.status !== OrderStatus.PRE_SELECT) return new ForbiddenException('STATE_MISMATCH');
@@ -81,6 +101,9 @@ export class OrderController {
   }
 
   @Post(':id/confirmation')
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse({ type: Error })
+  @ApiParam({ type: 'string', name: 'id' })
   public async confirmOrder(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId) {
     const order = await this.orderRepo.findById(id);
 
@@ -97,7 +120,10 @@ export class OrderController {
   }
 
   @Post(':id/post-selection')
-  public async selectPostPaymentMethod(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId, @Body() body: PaymentRequest) {
+  @ApiCreatedResponse()
+  @ApiForbiddenResponse({ type: Error })
+  @ApiParam({ type: 'string', name: 'id' })
+  public async selectPostPaymentMethod(@Param('id', new ObjectIdPipe('ORDER')) id: ObjectId, @Body() body: PaymentMethodSelection) {
     const order = await this.orderRepo.findById(id);
 
     if (order?.status !== OrderStatus.POST_SELECT) return new ForbiddenException('STATE_MISMATCH');

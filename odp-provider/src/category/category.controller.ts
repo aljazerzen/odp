@@ -1,9 +1,12 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiNotFoundResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Error } from 'src/common/error.dto';
 
+import { Category } from './category.dto';
 import { CategoryService } from './category.service';
-import { CategoryDTO } from './resolved-category.dto';
 
 @Controller('categories')
+@ApiTags('category')
 export class CategoryController {
 
   constructor(
@@ -11,7 +14,9 @@ export class CategoryController {
   ) { }
 
   @Get(':path')
-  public async getCategory(@Param('path') path: string): Promise<CategoryDTO> {
+  @ApiResponse({ type: Category, status: 200 })
+  @ApiNotFoundResponse({ type: Error })
+  public async getCategory(@Param('path') path: string): Promise<Category> {
     const { resolved, category } = await this.categoryService.resolveCategory(path ?? '');
 
     const children = await this.categoryService.getChildren([category]);
