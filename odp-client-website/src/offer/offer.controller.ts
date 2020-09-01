@@ -1,5 +1,5 @@
-import { Controller, Get, HttpService, Render, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, HttpService, Render, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 import { prependRelativeUrl } from '../url-util';
 import { OfferService } from './offer.service';
@@ -14,11 +14,15 @@ export class OfferController {
 
   @Get('/list/:category')
   @Render('offer/list')
-  async listPage(@Req() req: Request) {
+  async listPage(@Req() req: Request, @Res() res: Response) {
     const categoryPath = req.params.category ?? '$';
     const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
 
-    const { data: category } = await this.http.get(sourceUrl + '/categories/' + categoryPath).toPromise();
+    const { data: category } = await this.http.get(sourceUrl + '/categories/' + categoryPath).toPromise().catch(() => ({ data: null }));
+    if (!category) {
+      res.redirect('/');
+      return;
+    }
 
     const fields = {};
     for (const name in req.query) {

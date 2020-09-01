@@ -53,9 +53,35 @@ h5 {
 }
 
 .badge {
-  background-color: black; 
-  border-radius: 0.3rem; 
+  background-color: black;
+  border-radius: 0.3rem;
   color: white;
   padding: 1px 5px;
   font-weight: bold;
+}
+
+.card {
+  /* background-color: #ccc; */
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+}
+
+.card h5 {
+  margin-top: 0;
+}
+
+a.no-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -5px;
+}
+
+.col {
+  flex-basis: calc(50% - 10px);
+  padding: 5px;
 }

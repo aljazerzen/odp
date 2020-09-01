@@ -2,7 +2,7 @@
 {{#*inline "content-block"}}
 
 {{#unless (eq offer.categoryPath '$') }}
-<h2>
+<nav style="margin: 1rem 0">
   {{#split offer.categoryPath '.' }}
   <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
 
@@ -10,7 +10,7 @@
   <small> > </small>
   {{/unless}}
   {{/split }}
-</h2>
+</nav>
 {{/unless}}
 
 

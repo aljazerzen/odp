@@ -11,6 +11,7 @@ hbs.registerHelper('split', function (fullString: string, splitter, options: Hel
     if (data) {
       data.index = index;
       data.last = index === parts.length - 1;
+      data.oneBeforeLast = index === parts.length - 2;
       data.first = index === 0;
     }
 

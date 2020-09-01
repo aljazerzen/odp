@@ -2,15 +2,21 @@
 {{#*inline "content-block"}}
 
 {{#unless (eq category.path '$') }}
-<h2>
-  {{#split category.path '.' }}
+<div style="margin: 1rem 0">
+  {{#split (plus '$.' (removePrefix category.path '$.')) '.' }}
+  {{#if @last}}
+  <h2 style="margin-top: 0;">
+    <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
+  </h2>
+  {{else}}
   <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
 
-  {{#unless @last }}
+  {{#unless @oneBeforeLast }}
   <small> > </small>
   {{/unless}}
+  {{/if }}
   {{/split }}
-</h2>
+</div>
 {{/unless}}
 
 <h4>Podkategorije</h4>
@@ -58,33 +64,38 @@
 
 <small>Vseh: {{ offerPage.total }}</small>
 
-{{#each offerPage.content }}
-<article style="display: flex;">
-  <div>
-    <h5><a href="/offer/{{id}}">{{ title }}</a></h5>
+<div class="row">
+  {{#each offerPage.content }}
+  <div class="col">
+    <article class="card">
+      <a class="no-link" href="/offer/{{id}}">
+        <div style="padding: 1rem;">
 
-    {{#if price }}
-    {{ price.amount }} {{ price.currency }}
-    {{/if}}
+          <h5>{{ title }}</h5>
 
-    <br />
+          {{#if price }}
+          {{ price.amount }} {{ price.currency }}
+          {{/if}}
 
-    {{#eachKey @root.category.fields }}
+          <br />
 
-    {{#if (lookup (lookup @root.offerQuery 'fields') key) }}
-    {{#with (lookup ../fields key) }}
-    <small>{{ ../key }}: </small>{{ this }} {{ ../value.numeric.unit }}<br />
-    {{/with }}
-    {{/if}}
+          {{#eachKey @root.category.fields }}
 
-    {{/eachKey }}
+          {{#if (lookup (lookup @root.offerQuery 'fields') key) }}
+          {{#with (lookup ../fields key) }}
+          <small>{{ ../key }}: </small>{{ this }} {{ ../value.numeric.unit }}<br />
+          {{/with }}
+          {{/if}}
+
+          {{/eachKey }}
+
+          <img height="150" src="{{ images.[0] }}" />
+        </div>
+      </a>
+    </article>
   </div>
-  <div style="flex-grow: 1;"></div>
-  <div>
-    <img height="150" src="{{ images.[0] }}" />
-  </div>
-</article>
-{{/each }}
+  {{/each }}
+</div>
 
 {{/inline}}
 {{/layout/base}}

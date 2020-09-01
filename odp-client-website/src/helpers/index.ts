@@ -9,3 +9,4 @@ import './markdown';
 import './uri-encode';
 import './join-money';
 import './switch';
+import './remove-prefix';
