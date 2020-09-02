@@ -44,10 +44,9 @@ export class OfferController {
     const suffix = (pathParams.length > 0 ? '/' : '') + pathParams.join('_') +
       (queryParams.length > 0 ? '?' : '') + queryParams.join('&');
 
-    return {
-      content: await this.offerService.fetchOffers(query.categoryPath, suffix),
-      total: 0
-    };
+    const content = await this.offerService.fetchOffers(query.categoryPath, suffix);
+
+    return { content, total: content.length };
   }
 
   @Get(':offerId')
