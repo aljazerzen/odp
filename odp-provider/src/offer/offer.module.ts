@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import * as mongodb from 'nestjs-mongodb';
 import { CategoryModule } from 'src/category/category.module';
-import { DatabaseModule } from 'src/common/database.module';
+import { DatabaseModule, forRepository } from 'src/common/database.module';
 
 import { OfferController } from './offer.controller';
 import { OfferEntity } from './offer.entity';
@@ -11,10 +10,10 @@ import { OfferService } from './offer.service';
   controllers: [OfferController],
   providers: [
     OfferService,
-    mongodb.forRepository(OfferEntity, 'offers'),
+    forRepository(OfferEntity, 'offers'),
   ],
   exports: [
-    mongodb.forRepository(OfferEntity, 'offers'),
+    forRepository(OfferEntity, 'offers'),
   ],
   imports: [DatabaseModule, CategoryModule]
 })

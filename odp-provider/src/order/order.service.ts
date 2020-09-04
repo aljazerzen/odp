@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
-import { InjectRepo } from 'nestjs-mongodb';
+import { InjectRepo } from 'src/common/database.module';
 import { Money } from 'src/common/money';
 import { moneyAggregate, moneyMultiply } from 'src/money-util';
 import { OfferEntity } from 'src/offer/offer.entity';

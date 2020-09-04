@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
-import { InjectRepo } from 'nestjs-mongodb';
+import { InjectRepo } from 'src/common/database.module';
 
 import { ResolvedCategory } from './category.dto';
 import { CategoryEntity } from './category.entity';

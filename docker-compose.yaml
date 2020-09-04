@@ -1,0 +1,46 @@
+version: '3.7'
+services:
+
+  odp-provider:
+    image: aljazerzen/odp-provider:latest
+    init: true
+    ports:
+      - 3000:3000
+    depends_on:
+      - "odp-provider-mongo"
+    environment:
+      MONGO_URL: 'mongodb://odp-provider-mongo:27017/odp'
+
+  odp-provider-mongo:
+    image: mongo
+    restart: always
+    ports:
+     - 27017:27017
+    volumes:
+     - mongo-data-odp-provider:/data/db
+
+  odp-client-website:
+    image: aljazerzen/odp-client-website:latest
+    init: true
+    ports:
+      - 3100:3100
+
+  odp-adapter-iglusport:
+    image: aljazerzen/odp-adapter-iglusport:latest
+    init: true
+    ports:
+      - 3001:3001
+
+  odp-aggregator:
+    image: aljazerzen/odp-aggregator:latest
+    init: true
+    ports:
+      - 3002:3002
+    depends_on:
+      - 'odp-adapter-iglusport'
+      - 'odp-provider'
+    environment:
+      SOURCE_URLS: 'odp://odp-provider:3000,odp://odp-adapter-iglusport:3001'
+
+volumes:
+  mongo-data-odp-provider:

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
-import { InjectRepo } from 'nestjs-mongodb';
+import { InjectRepo } from 'src/common/database.module';
 import { Error } from 'src/common/error.dto';
 import { ObjectIdPipe } from 'src/object-id.pipe';
 

@@ -2,8 +2,8 @@ import { Body, Controller, Get, NotFoundException, Param } from '@nestjs/common'
 import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Condition, ObjectID, ObjectId } from 'mongodb';
 import { Repository } from 'mongodb-typescript';
-import { InjectRepo } from 'nestjs-mongodb';
 import { CategoryService } from 'src/category/category.service';
+import { InjectRepo } from 'src/common/database.module';
 import { Error } from 'src/common/error.dto';
 
 import { ObjectIdPipe } from '../object-id.pipe';
