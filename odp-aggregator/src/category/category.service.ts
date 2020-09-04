@@ -3,6 +3,12 @@ import { OdpClientService } from 'src/odp/odp.service';
 
 import { Category } from './category.dto';
 
+/**
+ * Usage: array.filter(onlyUnique)
+ */
+export function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
 @Injectable()
 export class CategoryService {
 
@@ -22,7 +28,7 @@ export class CategoryService {
     if (!categories.length) return null;
 
     const aggregated = categories.reduce((agg, cat) => {
-      agg.childrenNames = agg.childrenNames?.concat(cat.childrenNames);
+      agg.childrenNames = agg.childrenNames?.concat(cat.childrenNames)?.filter(onlyUnique) ?? [];
       agg.fields = {
         ...agg.fields,
         ...cat.fields
