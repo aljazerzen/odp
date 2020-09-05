@@ -3,7 +3,7 @@ import './cart-total.helper';
 import { Body, Controller, Get, HttpService, Post, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { prependRelativeUrl } from '../url-util';
+import { extractOdpUrl, prependRelativeUrl, urlOdpToHttp } from '../url-util';
 import { CartService } from './cart.service';
 
 @Controller()
@@ -17,8 +17,6 @@ export class CartController {
   @Get('cart')
   @Render('cart/cart')
   async cart(@Req() req: Request) {
-    const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
-
     const cart = this.cartService.parseCart(req.cookies.cart);
 
     const cartBySource = [];
@@ -37,14 +35,14 @@ export class CartController {
     }
 
     return {
-      sourceUrl,
+      sourceUrl: extractOdpUrl(req),
       cartBySource
     }
   }
 
   @Post('cart')
   async addToCart(@Req() req: Request, @Res() res: Response, @Body() body) {
-    const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
+    const sourceUrl = urlOdpToHttp(extractOdpUrl(req));
 
     const { data: offer } = await this.http.get(sourceUrl + '/offers/' + body.offerId).toPromise();
     offer.images = offer.images?.map(prependRelativeUrl(sourceUrl));

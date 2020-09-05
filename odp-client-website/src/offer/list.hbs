@@ -3,13 +3,13 @@
 
 {{#unless (eq category.path '$') }}
 <div style="margin: 1rem 0">
-  {{#split (plus '$.' (removePrefix category.path '$.')) '.' }}
+  {{#split (plus '$.' (removePrefix '$.' category.path )) '.' }}
   {{#if @last}}
   <h2 style="margin-top: 0;">
     <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
   </h2>
   {{else}}
-  <a href="/list/{{ prefix }}.{{ part }}">{{ part }}</a>
+  <a href="/list/{{removePrefix '.' (plus prefix (plus '.' part))}}">{{ part }}</a>
 
   {{#unless @oneBeforeLast }}
   <small> > </small>
@@ -19,12 +19,14 @@
 </div>
 {{/unless}}
 
+{{#if category.childrenNames.length }}
 <h4>Podkategorije</h4>
 <ul>
   {{#each category.childrenNames }}
   <li><a href="/list/{{ @root.category.path }}.{{ this }}">{{ this }}</a></li>
   {{/each }}
 </ul>
+{{/if}}
 
 <div style="position: relative;">
   <div class="card" style="position: absolute; right: calc(100% + 1rem); width: 20rem; padding: 0.5rem;">

@@ -1,5 +1,6 @@
 import { Body, Controller, Get, HttpService, Param, Post, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { extractOdpUrl } from 'src/url-util';
 
 import { CartService } from '../cart/cart.service';
 import { OfferService } from '../offer/offer.service';
@@ -17,8 +18,6 @@ export class OrderController {
   @Get('/orders')
   @Render('order/orders')
   async ordersPage(@Req() req: Request) {
-    const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
-
     const orderUrls = this.cartService.parseCart(req.cookies.orders);
 
     const orders = await Promise.all(
@@ -32,7 +31,7 @@ export class OrderController {
     );
 
     return {
-      sourceUrl,
+      sourceUrl: extractOdpUrl(req),
       orders
     };
   }

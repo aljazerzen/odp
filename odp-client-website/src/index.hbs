@@ -1,9 +1,23 @@
 {{#> layout/base }}
   {{#*inline "content-block"}}
     
-    <h1>ODP odjemalec</h1>
+    <h1>Pregledovalnik spletnih trgovin</h1>
     
-    <p>Dobrodošli v pregledovalniku spletnih trgovin!</p>
+    <p>
+      URL naslovi znanih spletni trgovin:
+
+      <ul>
+        <li>Enostven ponudnik: odp://46.101.247.207:3000</li>
+        <li>Adapter za www.iglusport.si: odp://46.101.247.207:3001</li>
+        <li>Agregator prvih dveh: odp://46.101.247.207:3002</li>
+      </ul>
+    </p>
+
+    {{#if error }}
+    <p>
+      {{ error }}
+    </p>
+    {{/if}}
 
   {{/inline}}
 {{/layout/base}}

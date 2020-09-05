@@ -2,8 +2,6 @@ import { Inject, Module, Provider } from '@nestjs/common';
 import { connect, MongoClient } from 'mongodb';
 import { ClassType, Repository, RepositoryOptions } from 'mongodb-typescript';
 
-import { CategoryEntity } from '../category/category.entity';
-
 const MONGO_TOKEN = 'MONGODB';
 
 function getRepoToken(Type: ClassType<any>) {
@@ -60,7 +58,6 @@ export function forRoot(url: string) {
 
 const providers: Provider[] = [
   forRoot(process.env.MONGO_URL ?? 'mongodb://localhost:27017/odp'),
-  forRepository(CategoryEntity, 'categories'),
 ];
 
 @Module({

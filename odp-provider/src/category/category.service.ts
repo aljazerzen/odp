@@ -22,12 +22,12 @@ export class CategoryService {
       path = path.substring(1);
     }
 
+    const names = path.split('.').filter(a => a.length > 0);
+
     const resolved: ResolvedCategory = {
-      path: path || '$',
+      path: ['$'].concat(names).join('.'),
       fields: {}
     };
-
-    const names = path.split('.').filter(a => a.length > 0);
 
     let parent: CategoryEntity | null = null;
     for (const name of names) {

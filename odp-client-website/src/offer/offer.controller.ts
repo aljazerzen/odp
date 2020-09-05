@@ -1,7 +1,7 @@
 import { Controller, Get, HttpService, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { prependRelativeUrl } from '../url-util';
+import { extractOdpUrl, prependRelativeUrl, urlOdpToHttp } from '../url-util';
 import { OfferService } from './offer.service';
 
 @Controller()
@@ -13,13 +13,14 @@ export class OfferController {
   ) { }
 
   @Get('/list/:category')
-  @Render('offer/list')
   async listPage(@Req() req: Request, @Res() res: Response) {
     const categoryPath = req.params.category ?? '$';
-    const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
+    const sourceUrl = urlOdpToHttp(extractOdpUrl(req));
 
-    const { data: category } = await this.http.get(sourceUrl + '/categories/' + categoryPath).toPromise().catch(() => ({ data: null }));
+    const { data: category, status } = await this.http.get(sourceUrl + '/categories/' + categoryPath).toPromise()
+      .catch((e) => ({ data: null, status: e.response?.status ?? e.code }));
     if (!category) {
+      res.cookie('errorMsg', `Napaka ${status} pri povezovanju do '${sourceUrl}'`);
       res.redirect('/');
       return;
     }
@@ -65,23 +66,24 @@ export class OfferController {
       offer.images = offer.images?.map(prependRelativeUrl(sourceUrl));
     }
 
-    return {
-      sourceUrl,
-      category,
-      offerPage,
-      offerQuery,
-      lastQuery: req.query
-    };
+    res.render(
+      'offer/list',
+      {
+        sourceUrl: extractOdpUrl(req),
+        category,
+        offerPage,
+        offerQuery,
+        lastQuery: req.query
+      }
+    );
   }
 
   @Get('/offer/:offerId')
   @Render('offer/offer')
   async offerPage(@Req() req: Request) {
-    const sourceUrl = req.cookies?.source ?? 'http://localhost:3000';
-
     return {
-      sourceUrl,
-      offer: await this.offerService.get(sourceUrl, req.params.offerId)
+      sourceUrl: extractOdpUrl(req),
+      offer: await this.offerService.get(urlOdpToHttp(extractOdpUrl(req)), req.params.offerId)
     };
   }
 }

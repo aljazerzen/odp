@@ -41,7 +41,9 @@ export class OrderService {
         offerId: (i.offer?.id ?? (i as any).offerId as ObjectId).toHexString()
       })),
       price: entity.price,
-      status: entity.status
+      status: entity.status,
+      postPayment: entity.postPayment,
+      prePayment: entity.prePayment,
     };
   }
 
@@ -55,7 +57,7 @@ export class OrderService {
 
     order.price = moneyAggregate(order.items.map(i => moneyMultiply(i.amount)(i.offer?.price ?? null)));
 
-    this.orderRepo.save(order);
+    await this.orderRepo.save(order);
   }
 
   async requestPre(orderId: ObjectId) {
@@ -72,7 +74,7 @@ export class OrderService {
       ]
     };
 
-    this.orderRepo.save(order);
+    await this.orderRepo.save(order);
   }
 
   async acceptPrePayment(orderId: ObjectId) {
@@ -81,7 +83,7 @@ export class OrderService {
 
     order.status = OrderStatus.ISSUE;
 
-    this.orderRepo.save(order);
+    await this.orderRepo.save(order);
 
     // schedule order issuing in 3 sec
     setTimeout(() => this.issue(order.id), 1000 * 3);
@@ -93,7 +95,7 @@ export class OrderService {
 
     order.status = OrderStatus.CONFIRM;
 
-    this.orderRepo.save(order);
+    await this.orderRepo.save(order);
   }
 
   async requestPost(orderId: ObjectId) {
@@ -110,7 +112,7 @@ export class OrderService {
       ]
     };
 
-    this.orderRepo.save(order);
+    await this.orderRepo.save(order);
   }
 
   async acceptPostPayment(orderId: ObjectId) {
@@ -119,6 +121,6 @@ export class OrderService {
 
     order.status = OrderStatus.DONE;
 
-    this.orderRepo.save(order);
+    await this.orderRepo.save(order);
   }
 }

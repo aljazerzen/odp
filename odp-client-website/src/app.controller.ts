@@ -1,14 +1,24 @@
 import { Body, Controller, Get, Post, Render, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+import { extractOdpUrl } from './url-util';
+
 @Controller()
 export class AppController {
 
   @Get()
   @Render('index')
-  root(@Req() req: Request) {
+  root(@Req() req: Request, @Res() res: Response) {
+
+    let error: string | null = null;
+    if (req.cookies.errorMsg) {
+      error = req.cookies.errorMsg;
+      res.clearCookie('errorMsg');
+    }
+
     return {
-      sourceUrl: req.cookies?.source ?? 'http://localhost:3000'
+      sourceUrl: extractOdpUrl(req),
+      error
     };
   }
 
