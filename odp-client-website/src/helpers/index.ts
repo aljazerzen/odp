@@ -10,3 +10,4 @@ import './uri-encode';
 import './join-money';
 import './switch';
 import './remove-prefix';
+import './object-size';
