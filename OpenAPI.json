@@ -1,0 +1,695 @@
+{
+    "openapi": "3.0.0",
+	"info": {
+        "contact": {},
+        "description": "Offer distribution protocol",
+        "title": "ODP",
+        "version": "1.0"
+    },
+    "components": {
+        "schemas": {
+            "CategoricalCriteria": {
+                "properties": {
+                    "in": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    }
+                },
+                "type": "object"
+            },
+            "Category": {
+                "properties": {
+                    "childrenNames": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "fields": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/FieldFormat"
+                        },
+                        "type": "object"
+                    },
+                    "path": {
+                        "example": "parent1Category.parent2Category.thisCategory",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "path",
+                    "fields",
+                    "childrenNames"
+                ],
+                "type": "object"
+            },
+            "CurrencyCriteria": {
+                "properties": {
+                    "currency": {
+                        "type": "string"
+                    },
+                    "range": {
+                        "$ref": "#/components/schemas/NumericCriteria"
+                    }
+                },
+                "required": [
+                    "currency",
+                    "range"
+                ],
+                "type": "object"
+            },
+            "Error": {
+                "properties": {
+                    "code": {
+                        "example": "DESCRIPTIVE_ERROR_CODE",
+                        "pattern": "[A-Z_]+",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "type": "object"
+            },
+            "FieldFormat": {
+                "properties": {
+                    "categorical": {
+                        "type": "object"
+                    },
+                    "numeric": {
+                        "type": "object"
+                    },
+                    "type": {
+                        "enum": [
+                            "NUMERIC",
+                            "MONEY",
+                            "CATEGORICAL",
+                            "TEXT"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "type",
+                    "categorical",
+                    "numeric"
+                ],
+                "type": "object"
+            },
+            "GenericCriteria": {
+                "properties": {
+                    "categorical": {
+                        "$ref": "#/components/schemas/CategoricalCriteria"
+                    },
+                    "money": {
+                        "$ref": "#/components/schemas/MoneyCriteria"
+                    },
+                    "numeric": {
+                        "$ref": "#/components/schemas/NumericCriteria"
+                    },
+                    "text": {
+                        "$ref": "#/components/schemas/TextCriteria"
+                    }
+                },
+                "type": "object"
+            },
+            "Money": {
+                "properties": {
+                    "amount": {
+                        "type": "number"
+                    },
+                    "currency": {
+                        "maxLength": 3,
+                        "minLength": 3,
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "amount",
+                    "currency"
+                ],
+                "type": "object"
+            },
+            "MoneyCriteria": {
+                "properties": {
+                    "currencies": {
+                        "items": {
+                            "$ref": "#/components/schemas/CurrencyCriteria"
+                        },
+                        "type": "array"
+                    },
+                    "includeOthers": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "NumericCriteria": {
+                "properties": {
+                    "max": {
+                        "type": "number"
+                    },
+                    "min": {
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "Offer": {
+                "properties": {
+                    "categoryPath": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "field": {
+                        "type": "object"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "images": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "price": {
+                        "$ref": "#/components/schemas/Money"
+                    },
+                    "reputation": {
+                        "type": "number"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "categoryPath",
+                    "title",
+                    "field",
+                    "price",
+                    "reputation",
+                    "images",
+                    "description"
+                ],
+                "type": "object"
+            },
+            "OfferPage": {
+                "properties": {
+                    "content": {
+                        "items": {
+                            "$ref": "#/components/schemas/Offer"
+                        },
+                        "type": "array"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "content",
+                    "total"
+                ],
+                "type": "object"
+            },
+            "OfferQuery": {
+                "properties": {
+                    "categoryPath": {
+                        "type": "string"
+                    },
+                    "fields": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/GenericCriteria"
+                        },
+                        "type": "object"
+                    },
+                    "price": {
+                        "$ref": "#/components/schemas/MoneyCriteria"
+                    },
+                    "reputation": {
+                        "$ref": "#/components/schemas/NumericCriteria"
+                    },
+                    "title": {
+                        "$ref": "#/components/schemas/TextCriteria"
+                    }
+                },
+                "required": [
+                    "categoryPath",
+                    "title",
+                    "fields",
+                    "price",
+                    "reputation"
+                ],
+                "type": "object"
+            },
+            "Order": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItem"
+                        },
+                        "type": "array"
+                    },
+                    "postPayment": {
+                        "$ref": "#/components/schemas/PaymentRequest"
+                    },
+                    "prePayment": {
+                        "$ref": "#/components/schemas/PaymentRequest"
+                    },
+                    "price": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OrderStatus"
+                    }
+                },
+                "type": "object"
+            },
+            "OrderItem": {
+                "properties": {
+                    "amount": {
+                        "type": "integer"
+                    },
+                    "offerId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "offerId",
+                    "amount"
+                ],
+                "type": "object"
+            },
+            "OrderStatus": {
+                "enum": [
+                    "QUOTE",
+                    "COMMIT",
+                    "PRE_REQUEST",
+                    "PRE_SELECT",
+                    "PRE_PROVIDE",
+                    "ISSUE",
+                    "CONFIRM",
+                    "POST_REQUEST",
+                    "POST_SELECT",
+                    "POST_PROVIDE",
+                    "RATE",
+                    "DONE",
+                    "CANCEL"
+                ],
+                "type": "string"
+            },
+            "PaymentMethodSelection": {
+                "properties": {
+                    "selectedMethod": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentRequest": {
+                "properties": {
+                    "availableMethods": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "money": {
+                        "items": {
+                            "$ref": "#/components/schemas/Money"
+                        },
+                        "type": "array"
+                    },
+                    "selectedMethod": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "money",
+                    "availableMethods"
+                ],
+                "type": "object"
+            },
+            "TextCriteria": {
+                "properties": {
+                    "includes": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "paths": {
+        "/categories/{path}": {
+            "get": {
+                "operationId": "getCategory",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "category"
+                ]
+            }
+        },
+        "/offers": {
+            "get": {
+                "operationId": "queryOffers",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OfferQuery"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OfferPage"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "offer"
+                ]
+            }
+        },
+        "/offers/{id}": {
+            "get": {
+                "operationId": "getOffer",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Offer"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "offer"
+                ]
+            }
+        },
+        "/orders": {
+            "post": {
+                "operationId": "placeOrder",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Order"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "order"
+                ]
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "operationId": "getOffer",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Order"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "order"
+                ]
+            }
+        },
+        "/orders/{id}/commitment": {
+            "post": {
+                "operationId": "commitOrder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "order"
+                ]
+            }
+        },
+        "/orders/{id}/confirmation": {
+            "post": {
+                "operationId": "confirmOrder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "order"
+                ]
+            }
+        },
+        "/orders/{id}/post-selection": {
+            "post": {
+                "operationId": "selectPostPaymentMethod",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentMethodSelection"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "order"
+                ]
+            }
+        },
+        "/orders/{id}/pre-selection": {
+            "post": {
+                "operationId": "selectPrePaymentMethod",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentMethodSelection"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "order"
+                ]
+            }
+        }
+    },
+    "servers": [],
+    "tags": []
+}
